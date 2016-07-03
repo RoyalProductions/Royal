@@ -1,0 +1,64 @@
+name = "Squirtle Catcher"
+author = "Royal" 
+description = "Catch Squirtle in Vermilion City"
+
+function onStart()
+	wildCounter = 0
+	shinyCounter = 0
+	squirtleCounter = 0
+end
+
+function onPause()
+	log("Shinies encountered: " .. shinyCounter)
+	log("Pokemons encountered: " .. wildCounter)
+	log("Squirtle's encountered: " .. squirtleCounter)
+end
+
+function onDialogMessage(pokecenter)
+    if stringContains(pokecenter, "Would you like me to heal your Pokemon?") then
+        pokecenterCounter = pokecenterCounter + 1
+    end
+end
+
+function onBattleMessage(wild)
+    if stringContains(wild, "A Wild SHINY ") then
+        shinyCounter = shinyCounter + 1
+		wildCounter = wildCounter + 1
+	elseif wild == "A Wild [FF9900]Squirtle[-] Attacks!" then
+		squirtleCounter = squirtleCounter + 1
+		wildCounter = wildCounter + 1
+    elseif stringContains(wild, "A Wild ") then
+        wildCounter = wildCounter + 1
+    end
+end
+
+function onPathAction()
+	if isPokemonUsable(1) and isPokemonUsable(2) then
+		if getMapName() == "Pokecenter Vermilion" then
+			moveToMap("Vermilion City")
+		elseif getMapName() == "Vermilion City" then
+			moveToWater()
+		end
+	else
+		if getMapName() == "Vermilion City" then
+			moveToMap("Pokecenter Vermilion")
+		elseif getMapName() == "Pokecenter Vermilion" then
+			usePokecenter()
+		end
+	end
+end
+
+function onBattleAction()
+	if isWildBattle() and isOpponentShiny() or getOpponentName() == "Squirtle" then
+		if getActivePokemonNumber() == 1 then
+			return sendPokemon(2) or run()
+		elseif getActivePokemonNumber == 2 then
+			if useItem("Ultra Ball") or useItem("Great Ball") or useItem("Pokeball") then
+				return
+			end
+		end
+	if getActivePokemonNumber() >= 1 then
+			return run() or attack() or sendUsablePokemon()
+		end
+	end
+end
