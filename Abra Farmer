@@ -1,0 +1,69 @@
+name = "Abra Catcher"
+author = "Royal"
+description = "Catching Abra in Route 5"
+
+function onStart()
+	wildCounter = 0
+	shinyCounter = 0
+	abraCounter = 0
+	shinxCounter = 0
+end
+
+function onPause()
+	log("Shinies encountered: " .. shinyCounter)
+	log("Pokemons encountered: " .. wildCounter)
+	log("Abra's encountered: " .. abraCounter)
+	log("Shinx's ecountered: " .. shinxCounter)
+end
+
+function onDialogMessage(pokecenter)
+    if stringContains(pokecenter, "Would you like me to heal your Pokemon?") then
+        pokecenterCounter = pokecenterCounter + 1
+    end
+end
+
+function onBattleMessage(wild)
+    if stringContains(wild, "A Wild SHINY ") then
+        shinyCounter = shinyCounter + 1
+		wildCounter = wildCounter + 1
+	elseif wild == "A Wild [FF9900]Abra[-] Attacks!" then
+		abraCounter = abraCounter + 1
+		wildCounter = wildCounter + 1
+	elseif wild == "A Wild [FF9900]Shinx[-] Attacks!" then
+		shinxCounter = shinxCounter + 1
+		wildCounter = wildCounter + 1
+    elseif stringContains(wild, "A Wild ") then
+        wildCounter = wildCounter + 1
+    end
+end
+
+function onPathAction()
+	if isPokemonUsable(1) then
+		if getMapName() == "Pokecenter Cerulean" then
+			moveToMap("Cerulean City")
+		elseif getMapName() == "Cerulean City" then
+			moveToMap("Route 5")
+		elseif getMapName() == "Route 5" then
+			moveToGrass()
+		end
+	else
+		if getMapName() == "Route 5" then
+			moveToMap("Cerulean City")
+		elseif getMapName() == "Cerulean City" then
+			moveToMap("Pokecenter Cerulean")
+		elseif getMapName() == "Pokecenter Cerulean" then
+			usePokecenter()
+		end
+	end
+end
+
+function onBattleAction()
+	if isWildBattle() and isOpponentShiny() or getOpponentName() == "Abra" or getOpponentName() == "Shinx" then
+		if useItem("Ultra Ball") or useItem("Great Ball") or useItem("Pokeball") then
+			return
+		end
+	end
+	if getActivePokemonNumber() >= 1 then
+		return run() or attack() or sendUsablePokemon()
+	end
+end
