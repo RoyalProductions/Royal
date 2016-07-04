@@ -1,4 +1,3 @@
-```Lua
 name = "Squirtle Catcher"
 author = "Royal" 
 description = "Catch Squirtle in Vermilion City"
@@ -82,4 +81,3 @@ function onBattleAction()
 		return run() or attack() or sendUsablePokemon()
 	end
 end
-```
