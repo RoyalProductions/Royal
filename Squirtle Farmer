@@ -65,7 +65,7 @@ function onPathAction()
 		elseif isShopOpen() then
 			buyItem(itemName, quantity)
 		end
-	elseif isPokemonUsable(1) and isPokemonUsable(2) then
+	elseif isPokemonUsable(1) then
 		if getMapName() == "Pokecenter Vermilion" then
 			moveToMap("Vermilion City")
 		elseif getMapName() == "Vermilion Pokemart" then
@@ -73,7 +73,7 @@ function onPathAction()
 		elseif getMapName() == "Vermilion City" then
 			moveToWater()
 		end
-	elseif not isPokemonUsable(1) and not isPokemonUsable(2) then
+	elseif not isPokemonUsable(1) then
 		if getMapName() == "Vermilion City" then
 			moveToMap("Pokecenter Vermilion")
 		elseif getMapName() == "Vermilion Pokemart" then
