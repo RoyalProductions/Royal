@@ -6,22 +6,27 @@ function onStart()
 	wildCounter = 0
 	shinyCounter = 0
 	squirtleCounter = 0
-	horseaCounter = 0
 	poliwagCounter = 0
 	tentacoolCounter = 0
 	tentacruelCounter = 0
 	pokecenterCounter = 0
+	startingMoney = getMoney()
+	startingLevel = getPokemonLevel(1)
+	itemName = "Pokeball"
+	quantity = 100
+	atLeast = 300
 end
 
 function onPause()
 	log("Times in Pokecenter: " .. pokecenterCounter)
 	log("Pokemons encountered: " .. wildCounter)
-	log("Shinies encountered: " .. shinyCounter .. " (" .. 100 * (shinyCounter/wildCounter) .. "%)")
-	log("Squirtle's encountered: " .. squirtleCounter .. " (" .. 100 * (squirtleCounter/wildCounter) .. "%)")
-	log("Horsea's encountered: " .. horseaCounter .. " (" .. 100 * (horseaCounter/wildCounter) .. "%)")
-	log("Poliwag's encountered: " .. poliwagCounter .. " (" .. 100 * (poliwagCounter/wildCounter) .. "%)")
-	log("Tentacool's encountered: " .. tentacoolCounter .. " (" .. 100 * (tentacoolCounter/wildCounter) .. "%)")
-	log("Tentacruel's encountered: " .. tentacruelCounter .. " (" .. 100 * (tentacruelCounter/wildCounter) .. "%)")
+	log("Shinies encountered: " .. shinyCounter .. " (" .. 100 * (shinyCounter/wildCounter) .. " %)")
+	log("Squirtle's encountered: " .. squirtleCounter .. " (" .. 100 * (squirtleCounter/wildCounter) .. " %)")
+	log("Poliwag's encountered: " .. poliwagCounter .. " (" .. 100 * (poliwagCounter/wildCounter) .. " %)")
+	log("Tentacool's encountered: " .. tentacoolCounter .. " (" .. 100 * (tentacoolCounter/wildCounter) .. " %)")
+	log("Tentacruel's encountered: " .. tentacruelCounter .. " (" .. 100 * (tentacruelCounter/wildCounter) .. " %)")
+	log("Pokedollars earned: "..tostring(getMoney() - startingMoney))
+	log("Your ".. getPokemonName(1) .." gained " .. (getPokemonLevel(1) - startingLevel) .. " level during the bot time.")
 end
 
 function onDialogMessage(pokecenter)
@@ -36,9 +41,6 @@ function onBattleMessage(wild)
 		wildCounter = wildCounter + 1
 	elseif wild == "A Wild [FF9900]Squirtle[-] Attacks!" then
 		squirtleCounter = squirtleCounter + 1
-		wildCounter = wildCounter + 1
-	elseif wild == "A Wild [FF9900]Horsea[-] Attacks!" then
-		horseaCounter = horseaCounter + 1
 		wildCounter = wildCounter + 1
 	elseif wild == "A Wild [FF9900]Poliwag[-] Attacks!" then
 		poliwagCounter = poliwagCounter + 1
@@ -55,15 +57,27 @@ function onBattleMessage(wild)
 end
 
 function onPathAction()
-	if isPokemonUsable(1) and isPokemonUsable(2) then
+	if getItemQuantity(itemName) < atLeast then
+		if getMapName() == "Vermilion City" then
+			moveToMap("Vermilion Pokemart")
+		elseif getMapName() == "Vermilion Pokemart" and not isShopOpen() then
+			talkToNpcOnCell(3, 5)
+		elseif isShopOpen() then
+			buyItem(itemName, quantity)
+		end
+	elseif isPokemonUsable(1) and isPokemonUsable(2) then
 		if getMapName() == "Pokecenter Vermilion" then
+			moveToMap("Vermilion City")
+		elseif getMapName() == "Vermilion Pokemart" then
 			moveToMap("Vermilion City")
 		elseif getMapName() == "Vermilion City" then
 			moveToWater()
 		end
-	else
+	elseif not isPokemonUsable(1) and not isPokemonUsable(2) then
 		if getMapName() == "Vermilion City" then
 			moveToMap("Pokecenter Vermilion")
+		elseif getMapName() == "Vermilion Pokemart" then
+			moveToMap("Vermilion City")
 		elseif getMapName() == "Pokecenter Vermilion" then
 			usePokecenter()
 		end
@@ -78,6 +92,6 @@ function onBattleAction()
 			end
 		end
 	else
-		return run() or attack() or sendUsablePokemon()
+		return attack() or run() or sendUsablePokemon()
 	end
 end
